@@ -1,0 +1,10 @@
+FROM alpine:3.14.3
+LABEL maintainer="gmaris@student.42.fr"
+
+RUN apk update && apk upgrade && apk add --no-cache \
+    mariadb \
+    mariadb-client
+
+COPY conf/conf.sh /tmp/conf.sh
+
+ENTRYPOINT ["sh", "/tmp/conf.sh"]

@@ -1,0 +1,73 @@
+version: "3.3"
+
+services:
+
+  nginx:
+    build: ./requirements/nginx/
+    container_name: nginx
+    volumes:
+      - Data_WordPress:/var/www/html/
+    ports:
+      - 443:443
+    networks:
+      - frontend
+    depends_on:
+      - wordpress
+    restart: always
+
+  mariadb:
+    build: ./requirements/mariadb/
+    container_name: mariadb
+    volumes:
+      - DB_WordPress:/var/lib/mysql/
+    environment:
+      MYSQL_ROOT_PWD:   ${MYSQL_ROOT_PWD}
+      WP_DATABASE_NAME: ${WP_DATABASE_NAME}
+      WP_DATABASE_USR:  ${WP_DATABASE_USR}
+      WP_DATABASE_PWD:  ${WP_DATABASE_PWD}
+    networks:
+      - backend
+    restart: always
+
+  wordpress:
+    build: ./requirements/wordpress/
+    container_name: wordpress
+    volumes:
+      - Data_WordPress:/var/www/html
+    depends_on:
+      - mariadb
+    environment:
+      MYSQL_HOST:       ${MYSQL_HOST}
+      WP_DATABASE_NAME: ${WP_DATABASE_NAME}
+      WP_DATABASE_USR:  ${WP_DATABASE_USR}
+      WP_DATABASE_PWD:  ${WP_DATABASE_PWD}
+      DOMAIN_NAME:      ${DOMAIN_NAME}
+      WP_TITLE:         ${WP_TITLE}
+      WP_ADMIN_USR:     ${WP_ADMIN_USR}
+      WP_ADMIN_PWD:     ${WP_ADMIN_PWD}
+      WP_ADMIN_EMAIL:   ${WP_ADMIN_EMAIL}
+      WP_USR:           ${WP_USR}
+      WP_PWD:           ${WP_PWD}
+      WP_EMAIL:         ${WP_EMAIL}
+    networks:
+      - frontend
+      - backend
+    restart: always
+
+networks:
+  frontend:
+  backend:
+
+volumes: 
+  DB_WordPress:
+      driver: local
+      driver_opts:
+        type: none
+        o: bind
+        device: /home/gmaris/data/DB_WordPress
+  Data_WordPress:
+      driver: local
+      driver_opts:
+        type: none
+        o: bind
+        device: /home/gmaris/data/Data_WordPress
